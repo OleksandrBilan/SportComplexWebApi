@@ -39,12 +39,14 @@ namespace WebApi.Services
             ConnectionString = configuration.GetConnectionString("SportComplex");
         }
 
-        public async Task<Employee> LoginAsync(string login, string password)
+        public async Task<EmployeeInfo> LoginAsync(string login, string password)
         {
             var sql = GetEmployeeSql + "\nWHERE e.Login = @login AND e.Password = @password;";
             
             using var connection = new SqlConnection(ConnectionString);
-            var employees = await connection.QueryAsync<Employee, PositionType, Gym, City, Employee>(
+            await connection.OpenAsync();
+
+            var employees = await connection.QueryAsync<EmployeeInfo, PositionType, Gym, City, EmployeeInfo>(
                 sql,
                 (employee, position, gym, city) =>
                 {
@@ -60,12 +62,14 @@ namespace WebApi.Services
             return employees.FirstOrDefault();
         }
 
-        public async Task<Employee> GetByIdAsync(int id)
+        public async Task<EmployeeInfo> GetByIdAsync(int id)
         {
             var sql = GetEmployeeSql + "\nWHERE e.Id = @id;";
 
             using var connection = new SqlConnection(ConnectionString);
-            var employees = await connection.QueryAsync<Employee, PositionType, Gym, City, Employee>(
+            await connection.OpenAsync();
+
+            var employees = await connection.QueryAsync<EmployeeInfo, PositionType, Gym, City, EmployeeInfo>(
                 sql,
                 (employee, position, gym, city) =>
                 {
@@ -81,10 +85,12 @@ namespace WebApi.Services
             return employees.FirstOrDefault();
         }
 
-        public async Task<List<Employee>> GetAllAsync()
+        public async Task<List<EmployeeInfo>> GetAllAsync()
         {
             using var connection = new SqlConnection(ConnectionString);
-            var employees = await connection.QueryAsync<Employee, PositionType, Gym, City, Employee>(
+            await connection.OpenAsync();
+
+            var employees = await connection.QueryAsync<EmployeeInfo, PositionType, Gym, City, EmployeeInfo>(
                 GetEmployeeSql,
                 (employee, position, gym, city) =>
                 {
@@ -104,17 +110,21 @@ namespace WebApi.Services
             const string sql = "DELETE FROM Employee WHERE Id = @id";
 
             using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
             int affectedRows = await connection.ExecuteAsync(sql, new { id });
 
             return affectedRows == 1;
         }
 
-        public async Task<Employee> CreateAsync(EmployeeApiModel employee)
+        public async Task<EmployeeInfo> CreateAsync(EmployeeApiModel employee)
         {
             const string insertSql = @"INSERT INTO Employee ([FirstName],[LastName],[PhoneNumber],[Position],[CreateDateTime],[HireDate],[DismissDate],[Login],[Password],[Gym])
-                                 VALUES (@FirstName,@LastName,@PhoneNumber,@PositionId,@CreateDateTime,@HireDate,@DismissDate,@Login,@Password,@GymId);";
+                                       VALUES (@FirstName,@LastName,@PhoneNumber,@PositionId,@CreateDateTime,@HireDate,@DismissDate,@Login,@Password,@GymId);";
 
-            var connection = new SqlConnection(ConnectionString);
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
             int affectedRows = await connection.ExecuteAsync(insertSql,
                                                              new
                                                              {
@@ -140,7 +150,7 @@ namespace WebApi.Services
             return await GetByIdAsync(createdId);
         }
 
-        public async Task<Employee> UpdateAsync(EmployeeApiModel employee)
+        public async Task<EmployeeInfo> UpdateAsync(EmployeeApiModel employee)
         {
             var sql = @"UPDATE Employee
                         SET [FirstName]		 = @FirstName
@@ -155,7 +165,9 @@ namespace WebApi.Services
                            ,[Gym]			 = @GymId
                         WHERE Id = @id";
 
-            var connection = new SqlConnection(ConnectionString);
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
             int affectedRows = await connection.ExecuteAsync(sql,
                                                              new
                                                              {

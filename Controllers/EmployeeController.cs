@@ -29,7 +29,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("getById")]
-        public async Task<IActionResult> LoginAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             var employee = await _employeeService.GetByIdAsync(id);
 

@@ -2,7 +2,7 @@
 
 namespace WebApi.Models.Employee
 {
-    public class Employee
+    public class EmployeeInfo
     {
         public int Id { get; set; }
 

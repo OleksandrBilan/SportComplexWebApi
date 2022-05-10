@@ -37,14 +37,14 @@ namespace WebApi.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateAsync([FromBody] CoachApiModel coach)
         {
-            var createdEmployee = await _coachService.CreateAsync(coach);
+            var createdCoach = await _coachService.CreateAsync(coach);
 
-            if (createdEmployee is null)
+            if (createdCoach is null)
             {
                 return BadRequest();
             }
 
-            return Ok(createdEmployee);
+            return Ok(createdCoach);
         }
 
         [HttpPut("update")]

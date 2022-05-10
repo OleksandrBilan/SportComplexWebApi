@@ -32,6 +32,7 @@ namespace WebApi
             services.AddTransient<SportTypeService>();
             services.AddTransient<SportSectionService>();
             services.AddTransient<SubscriptionTypeService>();
+            services.AddTransient<SubscriptionReceiptService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

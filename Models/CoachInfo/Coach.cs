@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using WebApi.Models.Employee;
+using WebApi.Models.EmployeeInfo;
 
 namespace WebApi.Models.CoachInfo
 {
@@ -7,7 +7,7 @@ namespace WebApi.Models.CoachInfo
     {
         public int Id { get; set; }
 
-        public EmployeeInfo EmployeeInfo { get; set; }
+        public Employee EmployeeInfo { get; set; }
 
         public string Description { get; set; }
         

@@ -1,4 +1,4 @@
-﻿namespace WebApi.Models.Employee
+﻿namespace WebApi.Models.EmployeeInfo
 {
     public class Gym
     {

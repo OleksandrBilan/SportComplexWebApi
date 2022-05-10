@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace WebApi.Models.Employee
+namespace WebApi.Models.EmployeeInfo
 {
-    public class EmployeeInfo
+    public class Employee
     {
         public int Id { get; set; }
 

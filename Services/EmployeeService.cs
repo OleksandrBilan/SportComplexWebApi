@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApi.ApiModels.Employee;
-using WebApi.Models.Employee;
+using WebApi.Models.EmployeeInfo;
 
 namespace WebApi.Services
 {
@@ -39,14 +39,14 @@ namespace WebApi.Services
             ConnectionString = configuration.GetConnectionString("SportComplex");
         }
 
-        public async Task<EmployeeInfo> LoginAsync(string login, string password)
+        public async Task<Employee> LoginAsync(string login, string password)
         {
             var sql = GetEmployeeSql + "\nWHERE e.Login = @login AND e.Password = @password;";
             
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var employees = await connection.QueryAsync<EmployeeInfo, PositionType, Gym, City, EmployeeInfo>(
+            var employees = await connection.QueryAsync<Employee, PositionType, Gym, City, Employee>(
                 sql,
                 (employee, position, gym, city) =>
                 {
@@ -62,14 +62,14 @@ namespace WebApi.Services
             return employees.FirstOrDefault();
         }
 
-        public async Task<EmployeeInfo> GetByIdAsync(int id)
+        public async Task<Employee> GetByIdAsync(int id)
         {
             var sql = GetEmployeeSql + "\nWHERE e.Id = @id;";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var employees = await connection.QueryAsync<EmployeeInfo, PositionType, Gym, City, EmployeeInfo>(
+            var employees = await connection.QueryAsync<Employee, PositionType, Gym, City, Employee>(
                 sql,
                 (employee, position, gym, city) =>
                 {
@@ -85,12 +85,12 @@ namespace WebApi.Services
             return employees.FirstOrDefault();
         }
 
-        public async Task<List<EmployeeInfo>> GetAllAsync()
+        public async Task<List<Employee>> GetAllAsync()
         {
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var employees = await connection.QueryAsync<EmployeeInfo, PositionType, Gym, City, EmployeeInfo>(
+            var employees = await connection.QueryAsync<Employee, PositionType, Gym, City, Employee>(
                 GetEmployeeSql,
                 (employee, position, gym, city) =>
                 {
@@ -117,7 +117,7 @@ namespace WebApi.Services
             return affectedRows == 1;
         }
 
-        public async Task<EmployeeInfo> CreateAsync(EmployeeApiModel employee)
+        public async Task<Employee> CreateAsync(EmployeeApiModel employee)
         {
             const string insertSql = @"INSERT INTO Employee ([FirstName],[LastName],[PhoneNumber],[Position],[CreateDateTime],[HireDate],[DismissDate],[Login],[Password],[Gym])
                                        VALUES (@FirstName,@LastName,@PhoneNumber,@PositionId,@CreateDateTime,@HireDate,@DismissDate,@Login,@Password,@GymId);";
@@ -150,7 +150,7 @@ namespace WebApi.Services
             return await GetByIdAsync(createdId);
         }
 
-        public async Task<EmployeeInfo> UpdateAsync(EmployeeApiModel employee)
+        public async Task<Employee> UpdateAsync(EmployeeApiModel employee)
         {
             var sql = @"UPDATE Employee
                         SET [FirstName]		 = @FirstName

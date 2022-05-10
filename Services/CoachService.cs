@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using WebApi.ApiModels;
 using WebApi.Models;
 using WebApi.Models.CoachInfo;
-using WebApi.Models.Employee;
+using WebApi.Models.EmployeeInfo;
 
 namespace WebApi.Services
 {
@@ -112,7 +112,7 @@ namespace WebApi.Services
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var coaches = await connection.QueryAsync<Coach, EmployeeInfo, PositionType, Gym, City, SportType, Coach>(
+            var coaches = await connection.QueryAsync<Coach, Employee, PositionType, Gym, City, SportType, Coach>(
                 sql,
                 (coach, employee, position, gym, city, sportType) =>
                 {
@@ -150,7 +150,7 @@ namespace WebApi.Services
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var coaches = await connection.QueryAsync<Coach, EmployeeInfo, PositionType, Gym, City, SportType, Coach>(
+            var coaches = await connection.QueryAsync<Coach, Employee, PositionType, Gym, City, SportType, Coach>(
                 GetCoachesSql,
                 (coach, employee, position, gym, city, sportType) =>
                 {
@@ -330,7 +330,7 @@ namespace WebApi.Services
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var individualCoaches = await connection.QueryAsync<IndividualCoach, Coach, EmployeeInfo, PositionType, Gym, City, SportType, IndividualCoach>(
+            var individualCoaches = await connection.QueryAsync<IndividualCoach, Coach, Employee, PositionType, Gym, City, SportType, IndividualCoach>(
                 GetIndividualCoachesSql,
                 (individualCoach, coach, employee, position, gym, city, sportType) =>
                 {

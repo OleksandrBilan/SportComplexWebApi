@@ -1,6 +1,6 @@
-﻿namespace WebApi.Models.Employee
+﻿namespace WebApi.Models.EmployeeInfo
 {
-    public class PositionType
+    public class City
     {
         public int Id { get; set; }
 

@@ -12,6 +12,6 @@ namespace WebApi.ApiModels.Membership
 
         public int MembershipTypeId { get; set; }
 
-        public DateTime PayementDateTime { get; set; }
+        public DateTime? PayementDateTime { get; set; }
     }
 }

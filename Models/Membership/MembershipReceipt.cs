@@ -13,6 +13,6 @@ namespace WebApi.Models.Membership
 
         public MembershipType MembershipType { get; set; }
 
-        public DateTime PayementDateTime { get; set; }
+        public DateTime? PayementDateTime { get; set; }
     }
 }

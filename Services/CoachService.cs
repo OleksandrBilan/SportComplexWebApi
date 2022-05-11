@@ -363,5 +363,45 @@ namespace WebApi.Services
 
             return result.AsList();
         }
+
+        public async Task<IndividualCoach> GetIndividualCoachByIdAsync(int id)
+        {
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var individualCoaches = await connection.QueryAsync<IndividualCoach, Coach, Employee, PositionType, Gym, City, SportType, IndividualCoach>(
+                GetIndividualCoachesSql + "\nWHERE ic.Id = @id",
+                (individualCoach, coach, employee, position, gym, city, sportType) =>
+                {
+                    gym.City = city;
+                    employee.Gym = gym;
+                    employee.Position = position;
+                    coach.EmployeeInfo = employee;
+
+                    if (coach.SportTypes is null)
+                    {
+                        coach.SportTypes = new List<SportType> { sportType };
+                    }
+                    else
+                    {
+                        coach.SportTypes.Add(sportType);
+                    }
+
+                    individualCoach.CoachInfo = coach;
+
+                    return individualCoach;
+                },
+                param: new { id },
+                splitOn: "Id");
+
+            var result = individualCoaches.GroupBy(ic => ic.Id).Select(ic =>
+            {
+                var individualCoach = ic.First();
+                individualCoach.CoachInfo.SportTypes = ic.Select(c => c.CoachInfo.SportTypes.FirstOrDefault()).ToList();
+                return individualCoach;
+            });
+
+            return result.FirstOrDefault();
+        }
     }
 }

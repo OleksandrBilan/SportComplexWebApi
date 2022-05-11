@@ -16,7 +16,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync([FromBody] LoginApiModel loginApiModel)
+        public async Task<IActionResult> LoginAsync([FromBody] LoginDto loginApiModel)
         {
             var employee = await _employeeService.LoginAsync(loginApiModel.Login, loginApiModel.Password);
 
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateAsync([FromBody] EmployeeApiModel employee)
+        public async Task<IActionResult> CreateAsync([FromBody] EmployeeDto employee)
         {
             var createdEmployee = await _employeeService.CreateAsync(employee);
 
@@ -61,7 +61,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] EmployeeApiModel employee)
+        public async Task<IActionResult> UpdateAsync([FromBody] EmployeeDto employee)
         {
             var updatedEmployee = await _employeeService.UpdateAsync(employee);
 

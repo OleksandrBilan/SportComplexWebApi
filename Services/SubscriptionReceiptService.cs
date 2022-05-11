@@ -96,7 +96,7 @@ namespace WebApi.Services
             return receipts.FirstOrDefault();
         }
 
-        public async Task<SubscriptionReceipt> CreateAsync(SubscriptionReceiptApiModel subscriptionReceipt)
+        public async Task<SubscriptionReceipt> CreateAsync(SubscriptionReceiptDto subscriptionReceipt)
         {
             const string insertSql = @"INSERT INTO SubscriptionReceipt (Employee, Customer, SubscriptionType, ExpireDate, IsPayed, IsActive, CreateDateTime)
                                        VALUES (@EmployeeId, @CustomerId, @SubscriptionTypeId, @ExpireDate, @IsPayed, @IsActive, @CreateDateTime);";
@@ -128,7 +128,7 @@ namespace WebApi.Services
             return await GetByIdAsync(createdId);
         }
 
-        public async Task<SubscriptionReceipt> UpdateAsync(SubscriptionReceiptApiModel subscriptionReceipt)
+        public async Task<SubscriptionReceipt> UpdateAsync(SubscriptionReceiptDto subscriptionReceipt)
         {
             const string updateSql = @"UPDATE SubscriptionReceipt
                                        SET Employee = @EmployeeId,

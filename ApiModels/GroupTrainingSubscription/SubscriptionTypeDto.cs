@@ -1,6 +1,6 @@
 ﻿namespace WebApi.ApiModels.GroupTrainingSubscription
 {
-    public class SubscriptionTypeApiModel
+    public class SubscriptionTypeDto
     {
         public int Id { get; set; }
 

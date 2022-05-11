@@ -2,7 +2,7 @@
 
 namespace WebApi.ApiModels.GroupTrainingSubscription
 {
-    public class SubscriptionReceiptApiModel
+    public class SubscriptionReceiptDto
     {
         public int Id { get; set; }
 

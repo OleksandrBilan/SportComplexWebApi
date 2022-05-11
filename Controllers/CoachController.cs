@@ -35,7 +35,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateAsync([FromBody] CoachApiModel coach)
+        public async Task<IActionResult> CreateAsync([FromBody] CoachDto coach)
         {
             var createdCoach = await _coachService.CreateAsync(coach);
 
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] CoachApiModel coach)
+        public async Task<IActionResult> UpdateAsync([FromBody] CoachDto coach)
         {
             var updatedCoach = await _coachService.UpdateAsync(coach);
 

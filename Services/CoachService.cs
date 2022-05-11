@@ -194,7 +194,7 @@ namespace WebApi.Services
             return affectedRows == 1;
         }
 
-        public async Task<Coach> CreateAsync(CoachApiModel coach)
+        public async Task<Coach> CreateAsync(CoachDto coach)
         {
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
@@ -249,7 +249,7 @@ namespace WebApi.Services
             return await GetByIdAsync(createdId);
         }
 
-        public async Task<Coach> UpdateAsync(CoachApiModel coach)
+        public async Task<Coach> UpdateAsync(CoachDto coach)
         {
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();

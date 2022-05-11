@@ -79,7 +79,7 @@ namespace WebApi.Services
             return subscriptionTypes.FirstOrDefault();
         }
 
-        public async Task<SubscriptionType> CreateAsync(SubscriptionTypeApiModel subscriptionType)
+        public async Task<SubscriptionType> CreateAsync(SubscriptionTypeDto subscriptionType)
         {
             const string insertSql = @"INSERT INTO SubscriptionType (SportSection, AvailableTrainingsCount, Price, CreateDateTime)
                                        VALUES (@SportSectionId, @AvailableTrainingsCount, @Price, @CreateDateTime);";
@@ -110,7 +110,7 @@ namespace WebApi.Services
             }
         }
 
-        public async Task<SubscriptionType> UpdateAsync(SubscriptionTypeApiModel subscriptionType)
+        public async Task<SubscriptionType> UpdateAsync(SubscriptionTypeDto subscriptionType)
         {
             var updateSql = @"UPDATE SubscriptionType
                               SET SportSection = @SportSectionId,

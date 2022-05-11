@@ -22,7 +22,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateAsync([FromBody] SubscriptionReceiptApiModel subscriptionReceipt)
+        public async Task<IActionResult> CreateAsync([FromBody] SubscriptionReceiptDto subscriptionReceipt)
         {
             var createdReceipt = await _subscriptionReceiptService.CreateAsync(subscriptionReceipt);
 
@@ -35,7 +35,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] SubscriptionReceiptApiModel subscriptionReceipt)
+        public async Task<IActionResult> UpdateAsync([FromBody] SubscriptionReceiptDto subscriptionReceipt)
         {
             var updatedReceipt = await _subscriptionReceiptService.UpdateAsync(subscriptionReceipt);
 

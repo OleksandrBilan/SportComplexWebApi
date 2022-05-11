@@ -2,7 +2,7 @@
 
 namespace WebApi.ApiModels
 {
-    public class CoachApiModel
+    public class CoachDto
     {
         public int Id { get; set; }
 

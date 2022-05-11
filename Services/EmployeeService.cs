@@ -117,7 +117,7 @@ namespace WebApi.Services
             return affectedRows == 1;
         }
 
-        public async Task<Employee> CreateAsync(EmployeeApiModel employee)
+        public async Task<Employee> CreateAsync(EmployeeDto employee)
         {
             const string insertSql = @"INSERT INTO Employee ([FirstName],[LastName],[PhoneNumber],[Position],[CreateDateTime],[HireDate],[DismissDate],[Login],[Password],[Gym])
                                        VALUES (@FirstName,@LastName,@PhoneNumber,@PositionId,@CreateDateTime,@HireDate,@DismissDate,@Login,@Password,@GymId);";
@@ -150,7 +150,7 @@ namespace WebApi.Services
             return await GetByIdAsync(createdId);
         }
 
-        public async Task<Employee> UpdateAsync(EmployeeApiModel employee)
+        public async Task<Employee> UpdateAsync(EmployeeDto employee)
         {
             var sql = @"UPDATE Employee
                         SET [FirstName]		 = @FirstName

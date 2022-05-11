@@ -79,7 +79,7 @@ namespace WebApi.Services
             return sportSections.FirstOrDefault();
         }
 
-        public async Task<SportSection> CreateAsync(SportSectionApiModel sportSection)
+        public async Task<SportSection> CreateAsync(SportSectionDto sportSection)
         {
             const string insertSql = @"INSERT INTO SportSection (Name, Description, SportType, CreateDateTime)
                                        VALUES (@Name, @Description, @SportTypeId, @CreateDateTime);";
@@ -108,7 +108,7 @@ namespace WebApi.Services
             return await GetByIdAsync(createdId);
         }
         
-        public async Task<SportSection> UpdateAsync(SportSectionApiModel sportSection)
+        public async Task<SportSection> UpdateAsync(SportSectionDto sportSection)
         {
             const string updateSql = @"UPDATE SportSection 
                                       SET Name = @Name,

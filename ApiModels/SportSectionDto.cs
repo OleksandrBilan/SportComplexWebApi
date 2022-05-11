@@ -1,6 +1,6 @@
 ﻿namespace WebApi.ApiModels
 {
-    public class SportSectionApiModel
+    public class SportSectionDto
     {
         public int Id { get; set; }
 

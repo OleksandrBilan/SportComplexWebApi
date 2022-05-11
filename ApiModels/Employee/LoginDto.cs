@@ -1,6 +1,6 @@
 ﻿namespace WebApi.ApiModels.Employee
 {
-    public class LoginApiModel
+    public class LoginDto
     {
         public string Login { get; set; }
 

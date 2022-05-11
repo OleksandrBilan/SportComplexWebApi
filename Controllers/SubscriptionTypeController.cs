@@ -22,7 +22,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateSubscriptionTypeAsync([FromBody] SubscriptionTypeApiModel subscriptionType)
+        public async Task<IActionResult> CreateSubscriptionTypeAsync([FromBody] SubscriptionTypeDto subscriptionType)
         {
             var createdSubscriptionType = await _subscriptionTypeService.CreateAsync(subscriptionType);
 
@@ -35,7 +35,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateSubscriptionTypeAsync([FromBody] SubscriptionTypeApiModel subscriptionType)
+        public async Task<IActionResult> UpdateSubscriptionTypeAsync([FromBody] SubscriptionTypeDto subscriptionType)
         {
             var updatedSubscriptionType = await _subscriptionTypeService.UpdateAsync(subscriptionType);
 

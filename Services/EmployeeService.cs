@@ -41,7 +41,7 @@ namespace WebApi.Services
 
         public async Task<Employee> LoginAsync(string login, string password)
         {
-            var sql = GetEmployeeSql + "\nWHERE e.Login = @login AND e.Password = @password;";
+            var sql = GetEmployeeSql + "\nWHERE e.Login LIKE @login";
             
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
@@ -59,7 +59,14 @@ namespace WebApi.Services
                 splitOn: "Id",
                 param: new { login, password });
 
-            return employees.FirstOrDefault();
+            var employee = employees.FirstOrDefault();
+
+            if (employee is null || !BCrypt.Net.BCrypt.Verify(password, employee.Password))
+            {
+                return null;
+            }
+
+            return employee;
         }
 
         public async Task<Employee> GetByIdAsync(int id)
@@ -136,7 +143,7 @@ namespace WebApi.Services
                                                                  employee.HireDate,
                                                                  employee.DismissDate,
                                                                  employee.Login,
-                                                                 employee.Password,
+                                                                 Password = BCrypt.Net.BCrypt.HashPassword(employee.Password),
                                                                  employee.GymId
                                                              });
             if (affectedRows != 1)

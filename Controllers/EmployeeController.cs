@@ -22,7 +22,7 @@ namespace WebApi.Controllers
 
             if (employee is null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
             return Ok(employee);

@@ -43,7 +43,7 @@ namespace WebApi.Services
                                        INNER JOIN CoachSportType as cst ON Coach.Id = cst.Coach
                                        INNER JOIN SportType as st ON cst.SportType = st.Id";
 
-        const string UpdateCoachSql = @"UPDATE Coach SET [Description] = @Description, UpdateDateTime = @UpdateDateTime;";
+        const string UpdateCoachSql = @"UPDATE Coach SET [Description] = @Description, UpdateDateTime = @UpdateDateTime WHERE Id = @Id";
 
         const string DeleteCoachSportTypesSql = @"DELETE FROM CoachSportType WHERE Coach = @Id;";
 
@@ -108,6 +108,46 @@ namespace WebApi.Services
         public async Task<Coach> GetByIdAsync(int id)
         {
             var sql = GetCoachesSql + "\nWHERE Coach.Id = @id;";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var coaches = await connection.QueryAsync<Coach, Employee, PositionType, Gym, City, SportType, Coach>(
+                sql,
+                (coach, employee, position, gym, city, sportType) =>
+                {
+                    gym.City = city;
+                    employee.Gym = gym;
+                    employee.Position = position;
+                    coach.EmployeeInfo = employee;
+
+                    if (coach.SportTypes is null)
+                    {
+                        coach.SportTypes = new List<SportType> { sportType };
+                    }
+                    else
+                    {
+                        coach.SportTypes.Add(sportType);
+                    }
+
+                    return coach;
+                },
+                splitOn: "Id",
+                param: new { id });
+
+            var result = coaches.GroupBy(c => c.Id).Select(c =>
+            {
+                var groupedCoach = c.First();
+                groupedCoach.SportTypes = c.Select(c => c.SportTypes.FirstOrDefault()).ToList();
+                return groupedCoach;
+            });
+
+            return result.FirstOrDefault();
+        }
+
+        public async Task<Coach> GetByEmployeeIdAsync(int id)
+        {
+            var sql = GetCoachesSql + "\nWHERE Coach.EmployeeId = @id;";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
@@ -262,7 +302,8 @@ namespace WebApi.Services
                                               new
                                               {
                                                   coach.Description,
-                                                  UpdateDateTime = DateTime.Now
+                                                  UpdateDateTime = DateTime.Now,
+                                                  coach.Id
                                               },
                                               transaction);
 

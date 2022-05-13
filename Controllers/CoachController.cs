@@ -28,6 +28,19 @@ namespace WebApi.Controllers
             return Ok(coach);
         }
 
+        [HttpGet("getByEmployeeId")]
+        public async Task<IActionResult> GetByEmployeeIdAsync(int employeeId)
+        {
+            var coach = await _coachService.GetByEmployeeIdAsync(employeeId);
+
+            if (coach is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(coach);
+        }
+
         [HttpGet("getAll")]
         public async Task<IActionResult> GetAllAsync()
         {

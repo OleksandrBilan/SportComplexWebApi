@@ -36,6 +36,7 @@ namespace WebApi
             services.AddTransient<MembershipTypeService>();
             services.AddTransient<MembershipReceiptService>();
             services.AddTransient<IndividualTrainingService>();
+            services.AddTransient<GroupService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +52,12 @@ namespace WebApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials());
 
             app.UseAuthorization();
 

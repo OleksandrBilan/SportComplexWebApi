@@ -198,5 +198,17 @@ namespace WebApi.Services
 
             return await GetByIdAsync(employee.Id);
         }
+
+        public async Task<List<PositionType>> GetPositionTypesAsync()
+        {
+            const string sql = @"SELECT * FROM PositionType";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var positions = await connection.QueryAsync<PositionType>(sql);
+
+            return positions.AsList();
+        }
     }
 }

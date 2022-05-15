@@ -85,5 +85,11 @@ namespace WebApi.Controllers
 
             return Ok();
         }
+
+        [HttpGet("getPositionTypes")]
+        public async Task<IActionResult> GetPositionTypesAsync()
+        {
+            return Ok(await _employeeService.GetPositionTypesAsync());
+        }
     }
 }

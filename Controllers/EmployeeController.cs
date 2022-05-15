@@ -91,5 +91,11 @@ namespace WebApi.Controllers
         {
             return Ok(await _employeeService.GetPositionTypesAsync());
         }
+
+        [HttpGet("getGyms")]
+        public async Task<IActionResult> GetGymsAsync()
+        {
+            return Ok(await _employeeService.GetGymsAsync());
+        }
     }
 }

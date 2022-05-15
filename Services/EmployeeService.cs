@@ -210,5 +210,39 @@ namespace WebApi.Services
 
             return positions.AsList();
         }
+
+        public async Task<List<Gym>> GetGymsAsync()
+        {
+            const string sql = @"SELECT g.[Id]
+                                    ,[Address]
+                                    ,[PhoneNumber]
+	                                ,c.Id
+	                                ,c.Name
+                              FROM [Gym] as g
+                              INNER JOIN City as c on g.City = c.Id";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var gyms = await connection.QueryAsync<int, string, string, int, string, Gym>(
+                sql,
+                (id, address, phoneNumber, cityId, cityName) =>
+                {
+                    return new Gym
+                    {
+                        Id = id,
+                        Address = address,
+                        PhoneNumber = phoneNumber,
+                        City = new City
+                        {
+                            Id = cityId,
+                            Name = cityName
+                        }
+                    };
+                },
+                splitOn: "Address,PhoneNumber,Id,Name");
+
+            return gyms.AsList();
+        }
     }
 }

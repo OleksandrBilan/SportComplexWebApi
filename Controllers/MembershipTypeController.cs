@@ -34,7 +34,7 @@ namespace WebApi.Controllers
             return Ok(createdType);
         }
 
-        [HttpPut("udpate")]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdateAsync([FromBody] MembershipTypeDto membershipType)
         {
             var updatedType = await _membershipTypeService.UpdateAsync(membershipType);

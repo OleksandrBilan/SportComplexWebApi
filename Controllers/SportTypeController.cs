@@ -35,16 +35,16 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateAsync(string name)
+        public async Task<IActionResult> CreateAsync([FromBody] SportType sportType)
         {
-            var sportType = await _sportTypeService.CreateAsync(name);
+            var createSportType = await _sportTypeService.CreateAsync(sportType.Name);
 
-            if (sportType is null)
+            if (createSportType is null)
             {
                 return BadRequest();
             }
 
-            return Ok(sportType);
+            return Ok(createSportType);
         }
 
         [HttpPut("update")]

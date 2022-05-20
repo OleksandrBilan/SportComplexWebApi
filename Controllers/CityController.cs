@@ -5,6 +5,7 @@ using WebApi.Services;
 
 namespace WebApi.Controllers
 {
+    [Route("api/city")]
     public class CityController : Controller
     {
         private readonly CityService _cityService;

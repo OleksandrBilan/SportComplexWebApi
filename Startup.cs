@@ -39,6 +39,7 @@ namespace WebApi
             services.AddTransient<GroupService>();
             services.AddTransient<GymService>();
             services.AddTransient<CityService>();
+            services.AddTransient<GroupTrainingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

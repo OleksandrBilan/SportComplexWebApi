@@ -91,16 +91,27 @@ namespace WebApi.Services
 
         public async Task<Group> CreateAsync(GroupDto group)
         {
-            const string insertSql = @"INSERT INTO [Group] (SportSection, Coach, MaxCustomersNumber, StartDate, EndDate, CreateDateTime)
-                                       VALUES (@SportSectionId, @CoachId, @MaxCustomersNumber, @StartDate, @EndDate, @CreateDateTime)";
+            const string insertGroupSql = @"INSERT INTO [Group] (SportSection, Coach, MaxCustomersNumber, StartDate, EndDate, CreateDateTime)
+                                            VALUES (@SportSectionId, @CoachId, @MaxCustomersNumber, @StartDate, @EndDate, @CreateDateTime)";
 
-            const string getIdSql = @"SELECT MAX(Id) FROM [Group]";
+            const string insertTrainingScheduleSql = @"INSERT INTO TrainingSchedule (Day, StartTime, EndTime, CreateDateTime)
+                                                       VALUES (@DayId, @StartTime, @EndTime)";
+
+            const string insertDependencySql = @"INSERT INTO GroupTrainingSchedule (Group, TrainingSchedule)
+                                                 VALUES (@GroupId, @ScheduleId)";
+
+            const string findSameScheduleSql = @"SELECT Id FROM TrainingSchedule
+                                                 WHERE Day = @DayId AND StartTime = @StartTime AND EndTime = @EndTime";
+
+            const string getGroupIdSql = @"SELECT MAX(Id) FROM [Group]";
+
+            const string getSheduleIdSql = @"SELECT MAX(Id) FROM TrainingSchedule";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
             int affectedRows = await connection.ExecuteAsync(
-                insertSql,
+                insertGroupSql,
                 new
                 {
                     group.SportSectionId,
@@ -116,9 +127,31 @@ namespace WebApi.Services
                 return null;
             }
 
-            int createdId = await connection.ExecuteScalarAsync<int>(getIdSql);
+            int createdGroupId = await connection.ExecuteScalarAsync<int>(getGroupIdSql);
 
-            return await GetByIdAsync(createdId);
+            foreach (var schedule in group.Schedules)
+            {
+                int scheduleId = await connection.ExecuteScalarAsync<int>(findSameScheduleSql, new { schedule.DayId, schedule.StartTime, schedule.EndTime });
+
+                if (scheduleId == 0)
+                {
+                    await connection.ExecuteAsync(
+                    insertTrainingScheduleSql,
+                    new
+                    {
+                        schedule.DayId,
+                        schedule.StartTime,
+                        schedule.EndTime,
+                        CreateDateTime = DateTime.Now
+                    });
+
+                    scheduleId = await connection.ExecuteScalarAsync<int>(getSheduleIdSql);
+                }
+
+                await connection.ExecuteAsync(insertDependencySql, new { GroupId = createdGroupId, ScheduleId = scheduleId });
+            }
+
+            return await GetByIdAsync(createdGroupId);
         }
 
         public async Task<Group> UpdateAsync(GroupDto group)
@@ -130,6 +163,21 @@ namespace WebApi.Services
                                        	   StartDate = @StartDate,
                                        	   EndDate = @EndDate
                                        WHERE Id = @Id";
+
+            const string insertTrainingScheduleSql = @"INSERT INTO TrainingSchedule (Day, StartTime, EndTime, CreateDateTime)
+                                                       VALUES (@DayId, @StartTime, @EndTime)";
+
+            const string insertDependencySql = @"INSERT INTO GroupTrainingSchedule (Group, TrainingSchedule)
+                                                 VALUES (@GroupId, @ScheduleId)";
+
+            const string findSameScheduleSql = @"SELECT Id FROM TrainingSchedule
+                                                 WHERE Day = @DayId AND StartTime = @StartTime AND EndTime = @EndTime";
+
+            const string deleteDependenciesSql = @"DELETE FROM GroupTrainingSchedule
+                                                   WHERE Group = @GroupId";
+
+            const string getSheduleIdSql = @"SELECT MAX(Id) FROM TrainingSchedule";
+
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
@@ -147,6 +195,30 @@ namespace WebApi.Services
                     group.Id
                 });
 
+            await connection.ExecuteAsync(deleteDependenciesSql, new { GroupId = group.Id });
+
+            foreach (var schedule in group.Schedules)
+            {
+                int scheduleId = await connection.ExecuteScalarAsync<int>(findSameScheduleSql, new { schedule.DayId, schedule.StartTime, schedule.EndTime });
+
+                if (scheduleId == 0)
+                {
+                    await connection.ExecuteAsync(
+                    insertTrainingScheduleSql,
+                    new
+                    {
+                        DayId = schedule.DayId,
+                        StartTime = schedule.StartTime,
+                        EndTime = schedule.EndTime,
+                        CreateDateTime = DateTime.Now
+                    });
+
+                    scheduleId = await connection.ExecuteScalarAsync<int>(getSheduleIdSql);
+                }
+
+                await connection.ExecuteAsync(insertDependencySql, new { GroupId = group.Id, ScheduleId = scheduleId });
+            }
+
             return await GetByIdAsync(group.Id);
         }
 
@@ -154,10 +226,15 @@ namespace WebApi.Services
         {
             const string deleteSql = @"DELETE FROM [Group] WHERE Id = @id";
 
+            const string deleteDependenciesSql = @"DELETE FROM GroupTrainingSchedule
+                                                   WHERE Group = @GroupId";
+
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
             int affectedRows = await connection.ExecuteAsync(deleteSql, new { id });
+
+            await connection.ExecuteAsync(deleteDependenciesSql, new { GroupId = id });
 
             return affectedRows == 1;
         }

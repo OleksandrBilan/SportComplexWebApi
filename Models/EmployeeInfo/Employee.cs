@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WebApi.Models.EmployeeInfo
 {
@@ -23,5 +24,9 @@ namespace WebApi.Models.EmployeeInfo
         public PositionType Position { get; set; }
 
         public Gym Gym { get; set; }
+
+        public List<Education> Educations { get; set; }
+
+        public List<PreviousJob> PreviousJobs { get; set; }
     }
 }

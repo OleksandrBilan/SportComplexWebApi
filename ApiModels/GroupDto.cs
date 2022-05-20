@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WebApi.ApiModels
 {
@@ -15,5 +16,18 @@ namespace WebApi.ApiModels
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
+
+        public List<TrainingScheduleDto> Schedules { get; set; }
+    }
+
+    public class TrainingScheduleDto
+    {
+        public int Id { get; set; }
+
+        public int DayId { get; set; }
+
+        public TimeSpan StartTime { get; set; }
+
+        public TimeSpan EndTime { get; set; }
     }
 }

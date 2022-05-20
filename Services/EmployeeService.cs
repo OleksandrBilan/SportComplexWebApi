@@ -54,6 +54,9 @@ namespace WebApi.Services
                     employee.Gym = gym;
                     employee.Position = position;
 
+                    employee.Educations = GetEmployeeEducationsAsync(employee.Id).Result;
+                    employee.PreviousJobs = GetEmployeePreviousJobsAsync(employee.Id).Result;
+
                     return employee;
                 },
                 splitOn: "Id",
@@ -84,6 +87,9 @@ namespace WebApi.Services
                     employee.Gym = gym;
                     employee.Position = position;
 
+                    employee.Educations = GetEmployeeEducationsAsync(employee.Id).Result;
+                    employee.PreviousJobs = GetEmployeePreviousJobsAsync(employee.Id).Result;
+
                     return employee;
                 },
                 splitOn: "Id",
@@ -104,6 +110,9 @@ namespace WebApi.Services
                     gym.City = city;
                     employee.Gym = gym;
                     employee.Position = position;
+
+                    employee.Educations = GetEmployeeEducationsAsync(employee.Id).Result;
+                    employee.PreviousJobs = GetEmployeePreviousJobsAsync(employee.Id).Result;
 
                     return employee;
                 },
@@ -211,38 +220,113 @@ namespace WebApi.Services
             return positions.AsList();
         }
 
-        public async Task<List<Gym>> GetGymsAsync()
+        #region Education
+
+        public async Task<List<Education>> GetEmployeeEducationsAsync(int id)
         {
-            const string sql = @"SELECT g.[Id]
-                                    ,[Address]
-                                    ,[PhoneNumber]
-	                                ,c.Id
-	                                ,c.Name
-                              FROM [Gym] as g
-                              INNER JOIN City as c on g.City = c.Id";
+            const string sql = @"SELECT ee.Id,ee.GraduationDate,u.Id,u.Name,el.Id,el.Name,es.Id,es.Name
+                                 FROM EmployeeEducation as ee
+                                 INNER JOIN University as u ON ee.University = u.Id
+                                 INNER JOIN EducationLevel as el ON ee.Level = el.Id
+                                 INNER JOIN EducationSpecialty as es ON ee.Specialty = es.Id
+                                 WHERE ee.Employee = @id";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var gyms = await connection.QueryAsync<int, string, string, int, string, Gym>(
-                sql,
-                (id, address, phoneNumber, cityId, cityName) =>
+            var educations = await connection.QueryAsync<Education, University, EducationLevel, EducationSpecialty, Education>(
+                sql, 
+                (education, university, eduLevel, eduSpecialty) =>
                 {
-                    return new Gym
-                    {
-                        Id = id,
-                        Address = address,
-                        PhoneNumber = phoneNumber,
-                        City = new City
-                        {
-                            Id = cityId,
-                            Name = cityName
-                        }
-                    };
-                },
-                splitOn: "Address,PhoneNumber,Id,Name");
+                    education.University = university;
+                    education.Level = eduLevel;
+                    education.Specialty = eduSpecialty;
 
-            return gyms.AsList();
+                    return education;
+                },
+                param: new { id },
+                splitOn: "Id");
+
+            return educations.AsList();
         }
+
+        public async Task AddEmployeeEducationAsync(EducationDto education)
+        {
+            const string sql = @"InsertEmployeeEducation";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            await connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    employeeId = education.EmployeeId,
+                    universityName = education.University,
+                    specialtyName = education.Specialty,
+                    graduationDate = education.GraduationDate,
+                    levelId = education.LevelId
+                },
+                commandType: System.Data.CommandType.StoredProcedure);
+        }
+
+        public async Task UpdateEmployeeEducationAsync(EducationDto education)
+        {
+            const string sql = @"UpdateEmployeeEducation";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            await connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    education.Id,
+                    universityName = education.University,
+                    specialtyName = education.Specialty,
+                    graduationDate = education.GraduationDate,
+                    levelId = education.LevelId
+                },
+                commandType: System.Data.CommandType.StoredProcedure);
+        }
+
+        public async Task DeleteEmployeeEducationAsync(int id)
+        {
+            const string sql = @"DELETE FROM EmployeeEducation WHERE Id = @id";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            await connection.ExecuteAsync(sql, new { id });
+        }
+
+        #endregion
+
+        #region PreviousJob
+
+        public async Task<List<PreviousJob>> GetEmployeePreviousJobsAsync(int id)
+        {
+            const string sql = @"SELECT pj.Id,pj.StartDate,pj.EndDate,c.Id,c.Name
+                                 FROM PreviousJob as pj
+                                 INNER JOIN Company as c ON pj.Company = c.Id
+                                 WHERE pj.Employee = @id";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var previousJobs = await connection.QueryAsync<PreviousJob, Company, PreviousJob>(
+                sql, 
+                (job, company) =>
+                {
+                    job.Company = company;
+                    return job;
+                },
+                param: new { id },
+                splitOn: "Id");
+
+            return previousJobs.AsList();
+        }
+
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WebApi.Models.CoachInfo;
 using WebApi.Models.GroupTrainingSubscription;
 
@@ -17,5 +18,7 @@ namespace WebApi.Models
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
+
+        public List<TrainingSchedule> Schedules { get; set; }
     }
 }

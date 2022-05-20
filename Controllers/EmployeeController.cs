@@ -92,10 +92,29 @@ namespace WebApi.Controllers
             return Ok(await _employeeService.GetPositionTypesAsync());
         }
 
-        [HttpGet("getGyms")]
-        public async Task<IActionResult> GetGymsAsync()
+        #region EmployeeEducation
+
+        [HttpPost("addEmployeeEducation")]
+        public async Task<IActionResult> AddEmployeeEducationAsync([FromBody] EducationDto education)
         {
-            return Ok(await _employeeService.GetGymsAsync());
+            await _employeeService.AddEmployeeEducationAsync(education);
+            return Ok();
         }
+
+        [HttpPut("updateEmployeeEducation")]
+        public async Task<IActionResult> UpdateEmployeeEducationAsync([FromBody] EducationDto education)
+        {
+            await _employeeService.UpdateEmployeeEducationAsync(education);
+            return Ok();
+        }
+
+        [HttpDelete("deleteEmployeeEducation")]
+        public async Task<IActionResult> DeleteEmployeeEducationAsync(int id)
+        {
+            await _employeeService.DeleteEmployeeEducationAsync(id);
+            return Ok();
+        }
+
+        #endregion
     }
 }

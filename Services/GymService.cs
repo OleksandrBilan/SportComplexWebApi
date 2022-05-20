@@ -119,24 +119,25 @@ namespace WebApi.Services
 
         public async Task<Gym> UpdateAsync(GymDto gym)
         {
-            const string insertSql = @"UPDATE Gym
-                                       SET Address = @Address,
-	                                       PhoneNumber = @PhoneNumber,
-	                                       City = @CityId,
-	                                       UpdateDateTime = @UpdateDateTime";
-
-            const string getSql = @"SELECT MAX(Id) FROM Gym";
+            const string sql = @"UPDATE Gym
+                                 SET Address = @Address,
+	                                 PhoneNumber = @PhoneNumber,
+	                                 City = @CityId,
+	                                 UpdateDateTime = @UpdateDateTime
+                                 WHERE Id = @Id";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            int affectedRows = await connection.ExecuteAsync(insertSql,
+            int affectedRows = await connection.ExecuteAsync(
+                sql,
                 new
                 {
                     gym.Address,
                     gym.PhoneNumber,
                     gym.CityId,
-                    UpdateDateTime = DateTime.Now
+                    UpdateDateTime = DateTime.Now,
+                    gym.Id
                 });
 
             if (affectedRows != 1)
@@ -144,9 +145,7 @@ namespace WebApi.Services
                 return null;
             }
 
-            int createdId = await connection.ExecuteScalarAsync<int>(getSql);
-
-            return await GetByIdAsync(createdId);
+            return await GetByIdAsync(gym.Id);
         }
 
         public async Task<bool> DeleteAsync(int id)

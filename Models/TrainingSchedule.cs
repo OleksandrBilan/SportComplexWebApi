@@ -8,9 +8,9 @@ namespace WebApi.Models
 
         public Day Day { get; set; }
 
-        public TimeSpan StartTime { get; set; }
+        public string StartTime { get; set; }
 
-        public TimeSpan EndTime { get; set; }
+        public string EndTime { get; set; }
     }
 
     public class Day

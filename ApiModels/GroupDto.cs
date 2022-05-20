@@ -26,8 +26,8 @@ namespace WebApi.ApiModels
 
         public int DayId { get; set; }
 
-        public TimeSpan StartTime { get; set; }
+        public string StartTime { get; set; }
 
-        public TimeSpan EndTime { get; set; }
+        public string EndTime { get; set; }
     }
 }

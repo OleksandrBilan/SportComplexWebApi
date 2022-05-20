@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApi.ApiModels;
 using WebApi.Models;
+using WebApi.Models.CoachInfo;
+using WebApi.Models.Membership;
 
 namespace WebApi.Services
 {
@@ -43,14 +45,20 @@ namespace WebApi.Services
                     return new IndividualTraining
                     {
                         Id = id,
-                        MembershipReceipt = _membershipReceiptService.GetByIdAsync(memReceiptId).Result,
+                        MembershipReceipt = new MembershipReceipt { Id = memReceiptId } ,
                         PayedHours = payedHours,
                         Price = price,
-                        Coach = _coachService.GetIndividualCoachByIdAsync(individualCoachId).Result,
+                        Coach = new IndividualCoach { Id = individualCoachId },
                         PayementDateTime = payementDateTime
                     };
                 },
                 splitOn: "MembershipReceipt,PayedHours,Price,IndividualCoach,PayementDateTime");
+
+            foreach(var individualTraining in trainings)
+            {
+                individualTraining.MembershipReceipt = await _membershipReceiptService.GetByIdAsync(individualTraining.MembershipReceipt.Id);
+                individualTraining.Coach = await _coachService.GetIndividualCoachByIdAsync(individualTraining.Coach.Id);
+            }
 
             return trainings.AsList();
         }

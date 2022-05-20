@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApi.ApiModels;
 using WebApi.Models;
+using WebApi.Models.CoachInfo;
+using WebApi.Models.GroupTrainingSubscription;
 
 namespace WebApi.Services
 {
@@ -33,6 +35,16 @@ namespace WebApi.Services
                                        ,[EndDate]
                                  FROM [Group]";
 
+            const string getScheduleSql = @"SELECT ts.[Id]
+                                                  ,cast([StartTime] as varchar) as StartTime
+                                                  ,cast([EndTime] as varchar) as EndTime
+	                                              ,d.Id
+	                                              ,d.Name
+                                              FROM [TrainingSchedule] as ts
+                                            INNER JOIN Day as d ON ts.Day = d.Id
+                                            INNER JOIN GroupTrainingSchedule as gts ON gts.TrainingSchedule = ts.Id
+									                                               AND gts.[Group] = @Id;";
+
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
@@ -43,14 +55,29 @@ namespace WebApi.Services
                     return new Group
                     {
                         Id = id,
-                        SportSection = _sportSectionService.GetByIdAsync(sportSectionId).Result,
-                        Coach = _coachService.GetByIdAsync(coachId).Result,
+                        SportSection = new SportSection { Id = sportSectionId },
+                        Coach = new Coach { Id = coachId },
                         MaxCustomersCount = maxCustomersNumber,
                         StartDate = startDate,
                         EndDate = endDate
                     };
                 },
                 splitOn: "SportSection,Coach,MaxCustomersNumber,StartDate,EndDate");
+
+            foreach (var group in groups)
+            {
+                group.SportSection = await _sportSectionService.GetByIdAsync(group.SportSection.Id);
+                group.Coach = await _coachService.GetByIdAsync(group.Coach.Id);
+                group.Schedules = (await connection.QueryAsync<TrainingSchedule, Day, TrainingSchedule>(
+                    getScheduleSql,
+                    (schedule, day) =>
+                    {
+                        schedule.Day = day;
+                        return schedule;
+                    },
+                    param: new { group.Id },
+                    splitOn: "Id")).AsList();
+            }
 
             return groups.AsList();
         }
@@ -66,6 +93,16 @@ namespace WebApi.Services
                                  FROM [Group]
                                  WHERE Id = @id";
 
+            const string getScheduleSql = @"SELECT ts.[Id]
+                                                  ,cast([StartTime] as varchar) as StartTime
+                                                  ,cast([EndTime] as varchar) as EndTime
+	                                              ,d.Id
+	                                              ,d.Name
+                                              FROM [TrainingSchedule] as ts
+                                            INNER JOIN Day as d ON ts.Day = d.Id
+                                            INNER JOIN GroupTrainingSchedule as gts ON gts.TrainingSchedule = ts.Id
+									                                               AND gts.[Group] = @Id;";
+
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
@@ -76,8 +113,8 @@ namespace WebApi.Services
                     return new Group
                     {
                         Id = id,
-                        SportSection = _sportSectionService.GetByIdAsync(sportSectionId).Result,
-                        Coach = _coachService.GetByIdAsync(coachId).Result,
+                        SportSection = new SportSection { Id = sportSectionId },
+                        Coach = new Coach { Id = coachId },
                         MaxCustomersCount = maxCustomersNumber,
                         StartDate = startDate,
                         EndDate = endDate
@@ -85,6 +122,21 @@ namespace WebApi.Services
                 },
                 param: new { id },
                 splitOn: "SportSection,Coach,MaxCustomersNumber,StartDate,EndDate");
+
+            foreach (var group in groups)
+            {
+                group.SportSection = await _sportSectionService.GetByIdAsync(group.SportSection.Id);
+                group.Coach = await _coachService.GetByIdAsync(group.Coach.Id);
+                group.Schedules = (await connection.QueryAsync<TrainingSchedule, Day, TrainingSchedule>(
+                    getScheduleSql,
+                    (schedule, day) =>
+                    {
+                        schedule.Day = day;
+                        return schedule;
+                    },
+                    param: new { id },
+                    splitOn: "Id")).AsList();
+            }
 
             return groups.FirstOrDefault();
         }
@@ -165,16 +217,16 @@ namespace WebApi.Services
                                        WHERE Id = @Id";
 
             const string insertTrainingScheduleSql = @"INSERT INTO TrainingSchedule (Day, StartTime, EndTime, CreateDateTime)
-                                                       VALUES (@DayId, @StartTime, @EndTime)";
+                                                       VALUES (@DayId, @StartTime, @EndTime, GETDATE())";
 
-            const string insertDependencySql = @"INSERT INTO GroupTrainingSchedule (Group, TrainingSchedule)
+            const string insertDependencySql = @"INSERT INTO GroupTrainingSchedule ([Group], TrainingSchedule)
                                                  VALUES (@GroupId, @ScheduleId)";
 
             const string findSameScheduleSql = @"SELECT Id FROM TrainingSchedule
                                                  WHERE Day = @DayId AND StartTime = @StartTime AND EndTime = @EndTime";
 
             const string deleteDependenciesSql = @"DELETE FROM GroupTrainingSchedule
-                                                   WHERE Group = @GroupId";
+                                                   WHERE [Group] = @GroupId";
 
             const string getSheduleIdSql = @"SELECT MAX(Id) FROM TrainingSchedule";
 

@@ -40,8 +40,8 @@ namespace WebApi.Services
                                        INNER JOIN PositionType as pt ON e.Position = pt.Id
                                        INNER JOIN Gym as g ON e.Gym = g.Id
                                        INNER JOIN City as c ON g.City = c.Id
-                                       INNER JOIN CoachSportType as cst ON Coach.Id = cst.Coach
-                                       INNER JOIN SportType as st ON cst.SportType = st.Id";
+                                       LEFT  JOIN CoachSportType as cst ON Coach.Id = cst.Coach
+                                       LEFT  JOIN SportType as st ON cst.SportType = st.Id";
 
         const string UpdateCoachSql = @"UPDATE Coach SET [Description] = @Description, UpdateDateTime = @UpdateDateTime WHERE Id = @Id";
 
@@ -93,8 +93,8 @@ namespace WebApi.Services
                                                  INNER JOIN PositionType as pt ON e.Position = pt.Id
                                                  INNER JOIN Gym as g ON e.Gym = g.Id
                                                  INNER JOIN City as c ON g.City = c.Id
-                                                 INNER JOIN CoachSportType as cst ON Coach.Id = cst.Coach
-                                                 INNER JOIN SportType as st ON cst.SportType = st.Id";
+                                                 LEFT  JOIN CoachSportType as cst ON Coach.Id = cst.Coach
+                                                 LEFT  JOIN SportType as st ON cst.SportType = st.Id";
 
         #endregion
 
@@ -297,7 +297,6 @@ namespace WebApi.Services
             var transaction = connection.BeginTransaction("InsertCoach");
             try
             {
-
                 await connection.ExecuteAsync(UpdateCoachSql,
                                               new
                                               {

@@ -32,6 +32,8 @@ namespace WebApi.Services
                                                 INNER JOIN Gym as g ON e.Gym = g.Id
                                                 INNER JOIN City as c ON g.City = c.Id";
 
+        private const int CoachPositionId = 2;
+
         private readonly string ConnectionString;
 
         public EmployeeService(IConfiguration configuration)
@@ -168,21 +170,30 @@ namespace WebApi.Services
 
         public async Task<Employee> UpdateAsync(EmployeeDto employee)
         {
-            var sql = @"UPDATE Employee
-                        SET [FirstName]		 = @FirstName
-                           ,[LastName]		 = @LastName
-                           ,[PhoneNumber]	 = @PhoneNumber
-                           ,[Position]		 = @PositionId
-                           ,[UpdateDateTime] = @UpdateDateTime
-                           ,[HireDate]		 = @HireDate
-                           ,[Login]			 = @Login
-                           ,[Password]		 = @Password
-                           ,[DismissDate]	 = @DismissDate
-                           ,[Gym]			 = @GymId
-                        WHERE Id = @id";
+            const string sql = @"UPDATE Employee
+                                 SET [FirstName]	  = @FirstName
+                                    ,[LastName]		  = @LastName
+                                    ,[PhoneNumber]	  = @PhoneNumber
+                                    ,[Position]		  = @PositionId
+                                    ,[UpdateDateTime] = @UpdateDateTime
+                                    ,[HireDate]		  = @HireDate
+                                    ,[Login]		  = @Login
+                                    ,[Password]		  = @Password
+                                    ,[DismissDate]	  = @DismissDate
+                                    ,[Gym]			  = @GymId
+                                 WHERE Id = @id";
+
+            const string deleteCoachSql = @"DELETE FROM Coach WHERE Employee = @Id";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
+
+            var oldEmployee = await GetByIdAsync(employee.Id);
+
+            if (oldEmployee.Position.Id == CoachPositionId && employee.PositionId != CoachPositionId)
+            {
+                await connection.ExecuteAsync(deleteCoachSql, new { employee.Id });
+            }
 
             int affectedRows = await connection.ExecuteAsync(sql,
                                                              new
@@ -221,6 +232,18 @@ namespace WebApi.Services
         }
 
         #region Education
+
+        public async Task<List<EducationLevel>> GetEducationLevelsAsync()
+        {
+            const string sql = @"SELECT Id, Name FROM EducationLevel";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var levels = await connection.QueryAsync<EducationLevel>(sql);
+
+            return levels.AsList();
+        }
 
         public async Task<List<Education>> GetEmployeeEducationsAsync(int id)
         {

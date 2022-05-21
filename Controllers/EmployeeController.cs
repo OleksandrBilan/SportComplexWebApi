@@ -94,6 +94,12 @@ namespace WebApi.Controllers
 
         #region EmployeeEducation
 
+        [HttpGet("getEducationLevels")]
+        public async Task<IActionResult> GetEducationLevelsAsync()
+        {
+            return Ok(await _employeeService.GetEducationLevelsAsync());
+        }
+
         [HttpPost("addEmployeeEducation")]
         public async Task<IActionResult> AddEmployeeEducationAsync([FromBody] EducationDto education)
         {

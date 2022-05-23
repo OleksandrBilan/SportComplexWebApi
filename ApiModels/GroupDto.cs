@@ -17,7 +17,7 @@ namespace WebApi.ApiModels
 
         public DateTime EndDate { get; set; }
 
-        public List<TrainingScheduleDto> Schedules { get; set; }
+        public List<TrainingScheduleDto> Schedules { get; set; } = new List<TrainingScheduleDto>();
     }
 
     public class TrainingScheduleDto

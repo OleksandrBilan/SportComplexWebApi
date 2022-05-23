@@ -8,7 +8,7 @@ namespace WebApi.ApiModels
 
         public int MembershipReceiptId { get; set; }
 
-        public int PayedHours { get; set; }
+        public double PayedHours { get; set; }
 
         public decimal Price { get; set; }
 

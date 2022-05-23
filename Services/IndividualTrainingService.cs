@@ -38,7 +38,7 @@ namespace WebApi.Services
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var trainings = await connection.QueryAsync<int, int, int, decimal, int, DateTime, IndividualTraining>(
+            var trainings = await connection.QueryAsync<int, int, double, decimal, int, DateTime, IndividualTraining>(
                 sql,
                 (id, memReceiptId, payedHours, price, individualCoachId, payementDateTime) =>
                 {
@@ -76,7 +76,7 @@ namespace WebApi.Services
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            var trainings = await connection.QueryAsync<int, int, decimal, int, DateTime, IndividualTraining>(
+            var trainings = await connection.QueryAsync<int, double, decimal, int, DateTime, IndividualTraining>(
                 sql,
                 (memReceiptId, payedHours, price, individualCoachId, payementDateTime) =>
                 {

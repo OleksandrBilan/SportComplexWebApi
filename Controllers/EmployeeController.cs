@@ -92,7 +92,7 @@ namespace WebApi.Controllers
             return Ok(await _employeeService.GetPositionTypesAsync());
         }
 
-        #region EmployeeEducation
+        #region Employee Education
 
         [HttpGet("getEducationLevels")]
         public async Task<IActionResult> GetEducationLevelsAsync()
@@ -103,19 +103,44 @@ namespace WebApi.Controllers
         [HttpPost("addEmployeeEducation")]
         public async Task<IActionResult> AddEmployeeEducationAsync([FromBody] EducationDto education)
         {
-            await _employeeService.AddEmployeeEducationAsync(education);
+            await _employeeService.UpsertEmployeeEducationAsync(education);
             return Ok();
         }
 
         [HttpPut("updateEmployeeEducation")]
         public async Task<IActionResult> UpdateEmployeeEducationAsync([FromBody] EducationDto education)
         {
-            await _employeeService.UpdateEmployeeEducationAsync(education);
+            await _employeeService.UpsertEmployeeEducationAsync(education);
             return Ok();
         }
 
         [HttpDelete("deleteEmployeeEducation")]
         public async Task<IActionResult> DeleteEmployeeEducationAsync(int id)
+        {
+            await _employeeService.DeleteEmployeeEducationAsync(id);
+            return Ok();
+        }
+
+        #endregion
+
+        #region Previus Jobs
+
+        [HttpPost("addEmployeePreviousJob")]
+        public async Task<IActionResult> AddEmployeePreviousJobAsync([FromBody] PreviousJobDto job)
+        {
+            await _employeeService.UpsertEmployeePreviousJobAsync(job);
+            return Ok();
+        }
+
+        [HttpPut("updateEmployeePreviousJob")]
+        public async Task<IActionResult> UpdateEmployeePreviousJobAsync([FromBody] PreviousJobDto job)
+        {
+            await _employeeService.UpsertEmployeePreviousJobAsync(job);
+            return Ok();
+        }
+
+        [HttpDelete("deleteEmployeePreviousJob")]
+        public async Task<IActionResult> DeleteEmployeePreviousJobAsync(int id)
         {
             await _employeeService.DeleteEmployeeEducationAsync(id);
             return Ok();

@@ -143,20 +143,21 @@ namespace WebApi.Services
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
 
-            int affectedRows = await connection.ExecuteAsync(insertSql,
-                                                             new
-                                                             {
-                                                                 employee.FirstName,
-                                                                 employee.LastName,
-                                                                 employee.PhoneNumber,
-                                                                 employee.PositionId,
-                                                                 CreateDateTime = DateTime.Now,
-                                                                 employee.HireDate,
-                                                                 employee.DismissDate,
-                                                                 employee.Login,
-                                                                 Password = BCrypt.Net.BCrypt.HashPassword(employee.Password),
-                                                                 employee.GymId
-                                                             });
+            int affectedRows = await connection.ExecuteAsync(
+                insertSql,
+                new
+                {
+                    employee.FirstName,
+                    employee.LastName,
+                    employee.PhoneNumber,
+                    employee.PositionId,
+                    CreateDateTime = DateTime.Now,
+                    employee.HireDate,
+                    employee.DismissDate,
+                    employee.Login,
+                    Password = BCrypt.Net.BCrypt.HashPassword(employee.Password),
+                    employee.GymId
+                });
             if (affectedRows != 1)
             {
                 return null;
@@ -195,21 +196,22 @@ namespace WebApi.Services
                 await connection.ExecuteAsync(deleteCoachSql, new { employee.Id });
             }
 
-            int affectedRows = await connection.ExecuteAsync(sql,
-                                                             new
-                                                             {
-                                                                 employee.FirstName,
-                                                                 employee.LastName,
-                                                                 employee.PhoneNumber,
-                                                                 employee.PositionId,
-                                                                 UpdateDateTime = DateTime.Now,
-                                                                 employee.HireDate,
-                                                                 employee.DismissDate,
-                                                                 employee.Login,
-                                                                 employee.Password,
-                                                                 employee.GymId,
-                                                                 employee.Id
-                                                             });
+            int affectedRows = await connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    employee.FirstName,
+                    employee.LastName,
+                    employee.PhoneNumber,
+                    employee.PositionId,
+                    UpdateDateTime = DateTime.Now,
+                    employee.HireDate,
+                    employee.DismissDate,
+                    employee.Login,
+                    employee.Password,
+                    employee.GymId,
+                    employee.Id
+                });
 
             if (affectedRows != 1)
             {
@@ -273,29 +275,9 @@ namespace WebApi.Services
             return educations.AsList();
         }
 
-        public async Task AddEmployeeEducationAsync(EducationDto education)
+        public async Task UpsertEmployeeEducationAsync(EducationDto education)
         {
-            const string sql = @"InsertEmployeeEducation";
-
-            using var connection = new SqlConnection(ConnectionString);
-            await connection.OpenAsync();
-
-            await connection.ExecuteAsync(
-                sql,
-                new
-                {
-                    employeeId = education.EmployeeId,
-                    universityName = education.University,
-                    specialtyName = education.Specialty,
-                    graduationDate = education.GraduationDate,
-                    levelId = education.LevelId
-                },
-                commandType: System.Data.CommandType.StoredProcedure);
-        }
-
-        public async Task UpdateEmployeeEducationAsync(EducationDto education)
-        {
-            const string sql = @"UpdateEmployeeEducation";
+            const string sql = @"UpsertEmployeeEducation";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
@@ -305,10 +287,11 @@ namespace WebApi.Services
                 new
                 {
                     education.Id,
-                    universityName = education.University,
-                    specialtyName = education.Specialty,
-                    graduationDate = education.GraduationDate,
-                    levelId = education.LevelId
+                    education.EmployeeId,
+                    UniversityName = education.University,
+                    SpecialtyName = education.Specialty,
+                    education.GraduationDate,
+                    education.LevelId
                 },
                 commandType: System.Data.CommandType.StoredProcedure);
         }
@@ -348,6 +331,36 @@ namespace WebApi.Services
                 splitOn: "Id");
 
             return previousJobs.AsList();
+        }
+
+        public async Task UpsertEmployeePreviousJobAsync(PreviousJobDto job)
+        {
+            const string sql = @"UpsertEmployeePreviousJob";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            await connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    job.Id,
+                    job.EmployeeId,
+                    CompanyName = job.Company,
+                    job.StartDate,
+                    job.EndDate
+                },
+                commandType: System.Data.CommandType.StoredProcedure);
+        }
+
+        public async Task DeleteEmployeePreviousJobAsync(int id)
+        {
+            const string sql = @"DELETE FROM PreviousJob WHERE Id = @id";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            await connection.ExecuteAsync(sql, new { id });
         }
 
         #endregion

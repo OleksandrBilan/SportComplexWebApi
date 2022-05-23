@@ -147,9 +147,9 @@ namespace WebApi.Services
                                             VALUES (@SportSectionId, @CoachId, @MaxCustomersNumber, @StartDate, @EndDate, @CreateDateTime)";
 
             const string insertTrainingScheduleSql = @"INSERT INTO TrainingSchedule (Day, StartTime, EndTime, CreateDateTime)
-                                                       VALUES (@DayId, @StartTime, @EndTime)";
+                                                       VALUES (@DayId, @StartTime, @EndTime, @CreateDateTime)";
 
-            const string insertDependencySql = @"INSERT INTO GroupTrainingSchedule (Group, TrainingSchedule)
+            const string insertDependencySql = @"INSERT INTO GroupTrainingSchedule ([Group], TrainingSchedule)
                                                  VALUES (@GroupId, @ScheduleId)";
 
             const string findSameScheduleSql = @"SELECT Id FROM TrainingSchedule
@@ -279,7 +279,7 @@ namespace WebApi.Services
             const string deleteSql = @"DELETE FROM [Group] WHERE Id = @id";
 
             const string deleteDependenciesSql = @"DELETE FROM GroupTrainingSchedule
-                                                   WHERE Group = @GroupId";
+                                                   WHERE [Group] = @GroupId";
 
             using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
@@ -289,6 +289,18 @@ namespace WebApi.Services
             await connection.ExecuteAsync(deleteDependenciesSql, new { GroupId = id });
 
             return affectedRows == 1;
+        }
+
+        public async Task<List<Day>> GetDaysAsync()
+        {
+            const string sql = @"SELECT Id, Name FROM Day";
+
+            using var connection = new SqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var days = await connection.QueryAsync<Day>(sql);
+
+            return days.AsList();
         }
     }
 }

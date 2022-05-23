@@ -60,5 +60,11 @@ namespace WebApi.Controllers
 
             return Ok();
         }
+
+        [HttpGet("getDays")]
+        public async Task<IActionResult> GetDaysAsync()
+        {
+            return Ok(await _groupService.GetDaysAsync());
+        }
     }
 }
